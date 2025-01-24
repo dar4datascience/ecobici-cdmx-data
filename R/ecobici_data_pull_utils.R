@@ -95,10 +95,43 @@ historical_ecobici_csv_hrefs %>%
 
 
 # test read 1 
-example_bike_data <- readr::read_csv(historical_ecobici_csv_hrefs$full_download_url[2])
+#might need to download and read
+#wha can duckdb do
+example_bike_data <- readr::read_csv(historical_ecobici_csv_hrefs$full_download_url[2]) #timeout
+
+library(duckdb)
+library(DBI)
+
+
+quack <- dbConnect(duckdb())
+
+#pending extensiosn
+dbExecute(quack, "INSTALL httpfs; LOAD httpfs;")
+
+# fails due to type inconsistency
+#eexample_tbl <- dbGetQuery(quack, 'SELECT * FROM read_csv("https://ecobici.cdmx.gob.mx/wp-content/uploads/2024/03/2024-02.csv", sample_size = -1)')
+
+dbGetQuery(quack, 'FROM sniff_csv("https://ecobici.cdmx.gob.mx/wp-content/uploads/2024/03/2024-02.csv")')
+
+library(dbplyr)
+# hora retiro and arribo is baldly parsed
+example_tbl <- tbl(quack, sql('SELECT Bici, Ciclo_Estacion_Retiro, Fecha_Retiro, Hora_Retiro, Ciclo_EstacionArribo, "Fecha Arribo", Hora_Arribo FROM read_csv("https://ecobici.cdmx.gob.mx/wp-content/uploads/2024/03/2024-02.csv",
+auto_detect=false,
+columns = {
+    "Bici": "INTEGER",  "Ciclo_Estacion_Retiro": "INTEGER",
+    "Fecha_Retiro": "DATE",
+    "Hora_Retiro": "TIME",
+    "Ciclo_Estacion_Arribo": "INTEGER",
+    "Fecha_Arribo": "DATE",
+    "Hora_Arribo": "TIME"
+}')) 
 
 
 
+
+example_tbl %>% glimpse()
+
+ # wirjst case download.file() process delete
 # Get Stationcoalesce()# Get Station Map From LIve Map -------------------------------------------
 
 
