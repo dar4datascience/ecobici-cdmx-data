@@ -1,3 +1,55 @@
+# Chek Data ---------------------------------------------------------------
+
+
+check_ecobici_data_completeness <- function(folder = "data_sink", historical_ecobici_csv_hrefs) {
+  
+  # for now because previous funciton returns just null
+  folder <- "data_sink"
+  
+  # List all parquet files
+  files <- dir_ls(folder, glob = "*.parquet")
+  
+  # Extract year and month
+  df <- tibble(
+    file = files,
+    date = files %>% path_file() %>% str_remove(".parquet") %>% ymd()
+  ) %>%
+    mutate(file_year = year(date), month = month(date)) 
+  
+  # Check completeness
+  expected <- expand.grid(file_year = unique(df$file_year), month = 1:12)
+  
+  completeness <- expected %>%
+    left_join(df, by = c("file_year", "month")) %>%
+    mutate(missing = is.na(file)) %>%
+    group_by(file_year) %>%
+    summarize(missing_months = list(month[missing])) |> 
+    ungroup()
+  
+  # now filter to get the problematic file_years
+  years_2_retry <- completeness |> 
+    #select(file_year) |> 
+    dplyr::filter(
+      between(file_year, 2011, year(Sys.Date()) -1 )
+    ) |> 
+    mutate(
+      missing_months = as.character(missing_months)
+    )  |> 
+    dplyr::filter(
+      stringr::str_length(missing_months) > 10
+    ) |> 
+    pull(
+      file_year
+    )
+  
+  urls_to_retry <- historical_ecobici_csv_hrefs |> 
+    dplyr::filter(
+      year(period) %in% years_2_retry
+    )
+  
+  return(urls_to_retry)
+}
+
 
 # Crawl Historical Information --------------------------------------------
 
@@ -122,7 +174,7 @@ validate_complete_years <- function(historical_ecobici_csv_hrefs) {
   cli_alert_info("Step 2: Validating if each year has 12 entries (months).")
   
   missing_years <- period_counts %>% 
-    filter(n != 12)
+    dplyr::filter(n != 12)
   
   if (nrow(missing_years) > 0) {
     cli_alert_danger("Validation failed! The following years are missing months or have extra months:")
@@ -135,15 +187,85 @@ validate_complete_years <- function(historical_ecobici_csv_hrefs) {
   return(period_counts)
 }
 
-# Example usage:
-# validated_years <- validate_complete_years(historical_ecobici_csv_hrefs)
+read_from_downloading_n_preprocess <- function(url, timeout = 300) {
+  cli_alert_info("Setting options and increasing timeout to {timeout} seconds.")
+  
+  # Set timeout option
+  options(timeout = max(timeout, getOption("timeout")))
+  
+  file_name <- basename(url)
+  
+  output_path <- glue::glue("landing/{file_name}")
+  
+  cli::cli_inform(
+    glue::glue("Downloading {url} to outputh path {output_path}")
+  )
+  
+  # Download FIle
+  download.file(url, output_path, )
 
-
-
-# test read 1 
-#might need to download and read
-#wha can duckdb do
-# example_bike_data <- readr::read_csv(historical_ecobici_csv_hrefs$full_download_url[2]) #timeout sometimes
+  on.exit(file.remove(output_path))
+  
+  # Step 1: Read data from URL using arrow
+  cli_alert_info("Reading CSV data from landing: {url}")
+  raw_df <- tryCatch({
+    arrow::read_csv_arrow(output_path)
+  }, error = function(e) {
+    cli_alert_danger("Failed to read data from URL: {url}. Error: {e$message}")
+    return(NULL)
+  })
+  
+  #print(raw_df)
+  
+  if (is.null(raw_df)) {
+    cli_alert_danger("Data loading failed. Exiting function.")
+    return(NULL)
+  }
+  
+  cli_alert_success("Data successfully loaded from File")
+  
+  # Step 2: Clean the data
+  cli_alert_info("Cleaning data: renaming columns, removing unnecessary ones, and parsing dates and times.")
+  
+  clean_df <- raw_df |>
+    janitor::clean_names() |> 
+    select(!c(genero_usuario, edad_usuario)) |> 
+    mutate(
+      fecha_arribo = dmy(fecha_arribo),
+      fecha_retiro = dmy(fecha_retiro),
+      hora_retiro = hms(hora_retiro),
+      hora_arribo = hms(hora_arribo)
+    )
+  
+  #write_csv_arrow(clean_df, "examine.csv")
+  
+  #print(colnames(clean_df))
+  
+  #glimpse(clean_df)
+  
+  clean_df <- clean_df |> 
+    mutate(
+      retiro_datetime_stamp = update(fecha_retiro, hours = hour(hora_retiro), minutes = minute(hora_retiro), seconds = second(hora_retiro)),
+      arribo_datetime_stamp = update(fecha_arribo, hours = hour(hora_arribo), minutes = minute(hora_arribo), seconds = second(hora_arribo))
+    ) 
+  
+  clean_df <- clean_df |> 
+    mutate(
+      duracion_viaje_secs = difftime(arribo_datetime_stamp, retiro_datetime_stamp),
+      duracion_viaje_mins = difftime(arribo_datetime_stamp, retiro_datetime_stamp, units = "mins")
+    ) |> 
+    select(
+      !c(fecha_arribo,
+         fecha_retiro,
+         hora_retiro,
+         hora_arribo)
+    )
+  
+  cli_alert_success("Data cleaned and processed successfully.")
+  
+  # Return the cleaned data frame
+  return(clean_df)
+}
 
 # Define the function to read data from URL and preprocess
 read_from_url_n_preprocess <- function(url, timeout = 300) {
@@ -154,16 +276,16 @@ read_from_url_n_preprocess <- function(url, timeout = 300) {
   
   # Step 1: Read data from URL using arrow
   cli_alert_info("Reading CSV data from URL: {url}")
-  example_df <- tryCatch({
+  raw_df <- tryCatch({
     arrow::read_csv_arrow(url)
   }, error = function(e) {
     cli_alert_danger("Failed to read data from URL: {url}. Error: {e$message}")
     return(NULL)
   })
   
-  #print(example_df)
+  #print(raw_df)
   
-  if (is.null(example_df)) {
+  if (is.null(raw_df)) {
     cli_alert_danger("Data loading failed. Exiting function.")
     return(NULL)
   }
@@ -173,7 +295,7 @@ read_from_url_n_preprocess <- function(url, timeout = 300) {
   # Step 2: Clean the data
   cli_alert_info("Cleaning data: renaming columns, removing unnecessary ones, and parsing dates and times.")
   
-  clean_df <- example_df |>
+  clean_df <- raw_df |>
     janitor::clean_names() |> 
     select(!c(genero_usuario, edad_usuario)) |> 
     mutate(
@@ -212,24 +334,18 @@ read_from_url_n_preprocess <- function(url, timeout = 300) {
   # Return the cleaned data frame
   return(clean_df)
 }
+
+
 process_ecobici_online_month_data <- function(full_download_url,period) {
   
-  #print(historical_ecobici_csv_hrefs)
-  
-  # Extract values correctly using [[ ]] 
-  # full_download_url <- historical_ecobici_csv_hrefs[['full_download_url']]
-  # period <- historical_ecobici_csv_hrefs[['period']]
-  
-  #print(full_download_url)
-  #print(period)
-  
   # Step 1: Read the data
-  cli_alert_info("Step 1: Reading data from URL: {full_download_url}")
+  cli_alert_info("Step 1: Reading data from File: {full_download_url}")
   
   clean_df <- tryCatch({
-    read_from_url_n_preprocess(full_download_url)  # Assuming this function works
+    read_from_downloading_n_preprocess(full_download_url)
+    #read_from_url_n_preprocess(full_download_url)  # Assuming this function works
   }, error = function(e) {
-    cli_alert_danger("Failed to read data from URL: {full_download_url}. Error: {e$message}")
+    cli_alert_danger("Failed to read data from File: {full_download_url}. Error: {e$message}")
     return(NULL)
   })
   
@@ -260,7 +376,30 @@ process_ecobici_online_month_data <- function(full_download_url,period) {
   return(clean_df)
 }
 
+sequential_process_of_urls <- function(historical_ecobici_csv_hrefs){
+  
+  # filter df to avoid redownloading all
+  historical_ecobici_csv_hrefs <- check_ecobici_data_completeness(folder = "data_sink",
+                                                                  historical_ecobici_csv_hrefs)
+  
+  
+  safe_process_ecobici_online_month_data <- purrr:::safely(process_ecobici_online_month_data)
+  
+  full_download_url <- historical_ecobici_csv_hrefs[['full_download_url']]
+  period <- historical_ecobici_csv_hrefs[['period']]
+  
+  results <- map2(full_download_url, 
+             period,
+             ~ safe_process_ecobici_online_month_data(.x, .y)
+  )
+  
+  return(results)
+  
+}
+
 process_all_rows_safely <- function(historical_ecobici_csv_hrefs) {
+  
+  # safely purrr would do a better jerb
   
   # Use purrr::pwalk to iterate over the rows of the dataframe
   cli_alert_info("Step 1: Starting to process each row in the dataframe.")
@@ -380,3 +519,35 @@ get_latest_station_information <- function() {
 
 # Process From To Trips ---------------------------------------------------
 
+
+
+
+
+
+
+# Combine parquets into single duckdb  ------------------------------------
+
+
+# Function to ingest Parquet files into DuckDB
+ingest_parquet_files <- function(folder = "data_sink") {
+  
+  # Initialize DuckDB connection
+  con <- dbConnect(duckdb::duckdb(), "data_sink.duckdb")
+  
+  on.exit(dbDisconnect(con))
+  
+  # List all parquet files
+  files <- dir_ls(folder, glob = "*.parquet")
+  
+  for (file in files) {
+    # Extract date-based name for the table
+    date_str <- path_file(file) %>% str_remove(".parquet")
+    table_name <- paste0("data_", gsub("-", "_", date_str))  # e.g., "data_2024_08_01"
+    
+    # Load Parquet file into DuckDB
+    query <- sprintf("CREATE TABLE %s AS SELECT * FROM read_parquet('%s')", table_name, file)
+    dbExecute(con, query)
+    
+    message(sprintf("Ingested %s into DuckDB as %s", file, table_name))
+  }
+}

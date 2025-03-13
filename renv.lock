@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.4.1",
+    "Version": "4.3.3",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -114,7 +114,7 @@
       "Package": "base64url",
       "Version": "1.4",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
+      "Repository": "CRAN",
       "Requirements": [
         "backports"
       ],
@@ -174,7 +174,7 @@
       "Package": "cli",
       "Version": "3.6.3",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
@@ -280,7 +280,7 @@
       "Package": "digest",
       "Version": "0.6.37",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
+      "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
@@ -309,6 +309,19 @@
         "vctrs"
       ],
       "Hash": "fedd9d00c2944ff00a0e2696ccf048ec"
+    },
+    "duckdb": {
+      "Package": "duckdb",
+      "Version": "1.2.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "DBI",
+        "R",
+        "methods",
+        "utils"
+      ],
+      "Hash": "338a8fac32b95bf6b9b5065ffed7374e"
     },
     "evaluate": {
       "Package": "evaluate",
@@ -513,7 +526,7 @@
       "Package": "jsonlite",
       "Version": "1.8.9",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
+      "Repository": "CRAN",
       "Requirements": [
         "methods"
       ],
@@ -1037,7 +1050,7 @@
       "Package": "yaml",
       "Version": "2.3.10",
       "Source": "Repository",
-      "Repository": "https://packagemanager.posit.co/cran/__linux__/noble/latest",
+      "Repository": "CRAN",
       "Hash": "51dab85c6c98e50a18d7551e9d49f76c"
     }
   }

@@ -10,6 +10,7 @@ library(tarchetypes) # Load other packages as needed.
 # Set target options:
 tar_option_set(
   packages = c("tibble",
+               "duckdb",
                "furrr",
                "future",
                "cli",
@@ -17,7 +18,9 @@ tar_option_set(
                "arrow",
                "dbplyr",
                "dplyr",
+               "fs",
                "jsonlite",
+               "stringr",
                "purrr",
                "rvest",
                "lubridate"), # Packages that your targets need for their tasks.
@@ -58,7 +61,7 @@ tar_option_set(
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source()
 # tar_source("other_functions.R") # Source other scripts as needed.
-ADD STEP TO CHECK AVAIABLE FILES AND SEARCH PENDNG ONES BEFORE 2015 WHICH MAKES SENSE...... 2015 IS GOOD I JUST WANT IT COMPKETE
+#ADD STEP TO CHECK AVAIABLE FILES AND SEARCH PENDNG ONES BEFORE 2015 WHICH MAKES SENSE...... 2015 IS GOOD I JUST WANT IT COMPKETE
 # Replace the target list below with your own:
 list(
   tar_target(
@@ -75,36 +78,21 @@ list(
     command = get_latest_station_information()
   ),
   tar_target(
-    name = ecobici_data_process,
-    command = process_all_rows_safely(historical_ecobici_csv_hrefs)
+    name = ecobici_data_process, #currently returns null
+    command = sequential_process_of_urls(historical_ecobici_csv_hrefs),
+    cue = tar_cue_skip(FALSE)
+  ),
+  # missing step to check downlaod results
+  tar_target(
+    name = ecobici_data_check,
+    command = check_ecobici_data_completeness(ecobici_data_process, historical_ecobici_csv_hrefs)
   )
-  # tarchetypes::tar_group_by(ecobici_data_groups,
-  #                           process_ecobici_online_month_data(historical_ecobici_csv_hrefs),
-  #                           download_urls,
-  #                           period), 
   # tar_target(
-  #   name = list_ecobici_records,
-  #   command = pmap(as.data.frame(historical_ecobici_csv_hrefs), function(...) {
-  #     row <- list(...)  # Capture the row as a list
-  #     return(row)       # Return the row
-  #   })
+  #   name = ecobici_data_process2, #currently returns null
+  #   command = sequential_process_of_urls(ecobici_data_check)
   # ),
   # tar_target(
-  #   ecobici_data_process,
-  #   process_ecobici_online_month_data(list_ecobici_records),
-  #   pattern = map(list_ecobici_records)
-  # )
-  # tar_target(
-  #   name = ecobici_data_groups,
-  #   command = historical_ecobici_csv_hrefs |>
-  #     group_by(download_urls, period) |> 
-  #     tar_group(),
-  #   iteration = "group"
-  # ),
-  # tar_target(
-  #   # iterate dynamicaly https://books.ropensci.org/targets/dynamic.html#list-iteration
-  #   name = ecobici_online_month_data,
-  #   command = process_ecobici_online_month_data(ecobici_data_groups),
-  #   pattern = map(ecobici_data_groups)
+  #   name = ecobici_data_check2,
+  #   command = check_ecobici_data_completeness(ecobici_data_process2, historical_ecobici_csv_hrefs)
   # )
 )
