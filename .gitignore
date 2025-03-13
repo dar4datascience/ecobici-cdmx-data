@@ -52,3 +52,4 @@ rsconnect/
 # Ignore heavy files
 *.parquet
 *.csv
+*.duckdb

@@ -86,6 +86,10 @@ list(
   tar_target(
     name = ecobici_data_check,
     command = check_ecobici_data_completeness(ecobici_data_process, historical_ecobici_csv_hrefs)
+  ),
+  tar_target(
+    name = quacky_db,
+    command = ingest_parquet_files()
   )
   # tar_target(
   #   name = ecobici_data_process2, #currently returns null
