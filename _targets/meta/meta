@@ -370,14 +370,13 @@ object|object|e490cf07e5b35bad|||||||||||||||
 historical_ecobici_csv_hrefs|stem|5032a2b8b4c170f2|0cd5854540c01518|7b04e232e96b00ed|-1017792170||t20157.1865688429s|s3270b|3270|rds|local|vector|||3.123||
 validation_historical_ecobici_csv_hrefs|stem|6a53c960c704a2ae|baf870705f0ee68f|2071bb91094d28fc|1582951276||t20157.1919544656s|s230b|230|rds|local|vector|||0.953||
 latest_station_information|stem|99bce553447c5c56|263a005abec448f4|5dbd5194b9e9d877|1856523307||t20157.1919957743s|s83627b|83627|rds|local|vector|||3.413||
-ecobici_data_check|stem|8d94921ba6adc964|abc17b900cd2e649|fa159e092427b523|-140485733||t20159.2772276293s|s268b|268|rds|local|vector|||0.793||
 ecobici_data_check2|stem|8d94921ba6adc964|5f94c6cb3d11a38a|bb9219e63d1ee0b7|-121327325||t20159.2783736675s|s268b|268|rds|local|vector|||0.841||
 ecobici_data_process2|stem|391817d38591ea69|ff59f31ae22c282b|9d20bfee6ee619b2|-1184475651||t20159.2826114921s|s46b|46|rds|local|vector|||0.616||
 validate_complete_years|function|1f5e717a9d78ee34|||||||||||||||
 parse_spanish_month_name|function|d4b28db217c2dfc2|||||||||||||||
 extract_year_month|function|02fdbcd00148f777|||||||||||||||
 get_latest_station_information|function|cda7860b5c9a3ddd|||||||||||||||
-.Random.seed|object|fe3adbf4892e23da|||||||||||||||
+.Random.seed|object|22659b25ee8966ab|||||||||||||||
 read_from_downloading_n_preprocess|function|fc7b57a8c5088a7f|||||||||||||||
 read_from_url_n_preprocess|function|d15996b9369931d7|||||||||||||||
 check_ecobici_data_completeness|function|ff5e6b2b0ccf8af8|||||||||||||||
@@ -385,18 +384,19 @@ ingest_parquet_files|function|a073cc85bb3faa16|||||||||||||||
 fetch_ecobici_cdmx_historical_monthly_csv_urls|function|ffedc3b0165dca57|||||||||||||||
 process_ecobici_online_month_data|function|5085ad5646b11a5b|||||||||||||||
 process_all_rows_safely|function|4f13240ec623247c|||||||||||||||
-sequential_process_of_urls|function|f10035a955533d72|||||||||||||||
-ecobici_data_process|stem|f0cdc44fecb4817f|bd385cfc0748c6d9|3090c5cc545e1e02|1080886661||t20157.3965648427s||44|rds|local|vector|||0.854||argument historical_ecobici_csv_hrefs is missing, with no default
+sequential_process_of_urls|function|bca736a7d9bbce99|||||||||||||||
+ecobici_data_process|stem|b6a82f78f8e7cf20|bd385cfc0748c6d9|f004e14209f281e8|1080886661||t20160.224296383s|s33496505b|33496505|rds|local|vector|||863.026|There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_arribo  dmyfecha_arribo.Caused by warning All formats failed to parse. No formats found.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning w|
+ecobici_data_check|stem|ac3db2fe93fe88be|abc17b900cd2e649|e496630862c0a5ed|-140485733||t20160.224391005s|s203b|203|rds|local|vector|||1.023||
 validate_complete_years|function|1f5e717a9d78ee34
 parse_spanish_month_name|function|d4b28db217c2dfc2
 extract_year_month|function|02fdbcd00148f777
 get_latest_station_information|function|cda7860b5c9a3ddd
-.Random.seed|object|d28d629a73bb8644
+.Random.seed|object|e10076aa2da18840
 read_from_downloading_n_preprocess|function|fc7b57a8c5088a7f
 read_from_url_n_preprocess|function|d15996b9369931d7
-check_ecobici_data_completeness|function|ff5e6b2b0ccf8af8
+check_ecobici_data_completeness|function|43233e8679ae8940
 ingest_parquet_files|function|a073cc85bb3faa16
 fetch_ecobici_cdmx_historical_monthly_csv_urls|function|ffedc3b0165dca57
 process_ecobici_online_month_data|function|5085ad5646b11a5b
 process_all_rows_safely|function|4f13240ec623247c
-sequential_process_of_urls|function|bca736a7d9bbce99
+sequential_process_of_urls|function|08429af50ca927a9

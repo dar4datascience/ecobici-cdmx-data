@@ -17,7 +17,7 @@ check_ecobici_data_completeness <- function(folder = "data_sink", historical_eco
     mutate(file_year = year(date), month = month(date)) 
   
   # Check completeness
-  expected <- expand.grid(file_year = unique(df$file_year), month = 1:12)
+  expected <- expand.grid(file_year = 2010:year(Sys.Date()), month = 1:12)
   
   completeness <- expected %>%
     left_join(df, by = c("file_year", "month")) %>%
@@ -29,15 +29,15 @@ check_ecobici_data_completeness <- function(folder = "data_sink", historical_eco
   # now filter to get the problematic file_years
   years_2_retry <- completeness |> 
     #select(file_year) |> 
-    dplyr::filter(
-      between(file_year, 2011, year(Sys.Date()) -1 )
-    ) |> 
+    # dplyr::filter(
+    #   between(file_year, 2009, year(Sys.Date()))
+    # ) |> 
     mutate(
       missing_months = as.character(missing_months)
     )  |> 
     dplyr::filter(
-      stringr::str_length(missing_months) > 10
-    ) |> 
+      missing_months != "numeric(0)"
+    )  |> 
     pull(
       file_year
     )
