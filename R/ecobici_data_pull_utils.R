@@ -527,27 +527,64 @@ get_latest_station_information <- function() {
 
 # Combine parquets into single duckdb  ------------------------------------
 
-
-# Function to ingest Parquet files into DuckDB
-ingest_parquet_files <- function(folder = "data_sink") {
-  
+ingest_parquet_files <- function(folder = "data_sink", table_name = "mx_ecobici_data") {
   # Initialize DuckDB connection
-  con <- dbConnect(duckdb::duckdb(), "data_sink.duckdb")
-  
+  con <- dbConnect(duckdb::duckdb(), "mx_ecobici_data.duckdb")
   on.exit(dbDisconnect(con))
   
   # List all parquet files
   files <- dir_ls(folder, glob = "*.parquet")
   
+  if (length(files) == 0) {
+    cli::cli_inform("No Parquet files found in the folder.")
+    return()
+  }
+  
+  # Ensure the table exists
+  dbExecute(con, sprintf(
+    "CREATE TABLE IF NOT EXISTS %s (
+      bici TEXT,
+      ciclo_estacion_retiro INTEGER,
+      ciclo_estacion_arribo INTEGER,
+      retiro_datetime_stamp TIMESTAMP,
+      arribo_datetime_stamp TIMESTAMP,
+      duracion_viaje_secs INTEGER,
+      duracion_viaje_mins DOUBLE
+    )", table_name
+  ))
+  
+  # Check schema of each Parquet file before ingestion
   for (file in files) {
-    # Extract date-based name for the table
-    date_str <- path_file(file) %>% str_remove(".parquet")
-    table_name <- paste0("data_", gsub("-", "_", date_str))  # e.g., "data_2024_08_01"
+    cli::cli_inform(sprintf("Checking schema for file: %s", file))
+    schema_query <- sprintf("SELECT name FROM parquet_schema('%s')", file)
+    schema <- dbGetQuery(con, schema_query)$name
     
-    # Load Parquet file into DuckDB
-    query <- sprintf("CREATE TABLE %s AS SELECT * FROM read_parquet('%s')", table_name, file)
+    expected_cols <- c(
+      "bici", "ciclo_estacion_retiro", "ciclo_estacion_arribo", 
+      "retiro_datetime_stamp", "arribo_datetime_stamp", 
+      "duracion_viaje_secs", "duracion_viaje_mins"
+    )
+    
+    if (!all(expected_cols %in% schema)) {
+      cli::cli_inform(sprintf("Skipping %s due to schema mismatch.", file))
+      next
+    }
+    
+    # Insert data while ensuring correct column types
+    query <- sprintf(
+      "INSERT INTO %s SELECT 
+      TRY_CAST(bici AS TEXT), 
+      TRY_CAST(ciclo_estacion_retiro AS INTEGER), 
+      TRY_CAST(ciclo_estacion_arribo AS INTEGER), 
+      TRY_CAST(retiro_datetime_stamp AS TIMESTAMP), 
+      TRY_CAST(arribo_datetime_stamp AS TIMESTAMP), 
+      TRY_CAST(duracion_viaje_secs AS INTEGER), 
+      TRY_CAST(duracion_viaje_mins AS DOUBLE) 
+      FROM read_parquet('%s')",
+      table_name, file
+    )
     dbExecute(con, query)
-    
-    message(sprintf("Ingested %s into DuckDB as %s", file, table_name))
+    cli::cli_inform(sprintf("Ingested %s into DuckDB table %s", file, table_name))
   }
 }
+

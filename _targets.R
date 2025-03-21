@@ -91,12 +91,4 @@ list(
     name = quacky_db,
     command = ingest_parquet_files()
   )
-  # tar_target(
-  #   name = ecobici_data_process2, #currently returns null
-  #   command = sequential_process_of_urls(ecobici_data_check)
-  # ),
-  # tar_target(
-  #   name = ecobici_data_check2,
-  #   command = check_ecobici_data_completeness(ecobici_data_process2, historical_ecobici_csv_hrefs)
-  # )
 )

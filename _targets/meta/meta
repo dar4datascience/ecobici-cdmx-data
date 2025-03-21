@@ -374,29 +374,19 @@ ecobici_data_check2|stem|8d94921ba6adc964|5f94c6cb3d11a38a|bb9219e63d1ee0b7|-121
 ecobici_data_process2|stem|391817d38591ea69|ff59f31ae22c282b|9d20bfee6ee619b2|-1184475651||t20159.2826114921s|s46b|46|rds|local|vector|||0.616||
 ecobici_data_process|stem|eba93f2f0eae230f|bd385cfc0748c6d9|5d97dfdf321159c0|1080886661||t20160.2539252819s|s78431559b|78431559|rds|local|vector|||1795.399|There were 2 warnings in mutate.The first warning wasℹ In argument hora_retiro  hmshora_retiro.Caused by warning in .parse_hms Some strings failed to parseℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument hora_retiro  hmshora_retiro.Caused by warning in .parse_hms Some strings failed to parseℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 3 warnings in mutate.The first warning wasℹ In argument fecha_retiro  dmyfecha_retiro.Caused by warning  4 failed to parse.ℹ Run dplyrlast_dplyr_warnings to see the 2 remaining warnings.. There were 2 warnings in mutate.The first warning wasℹ In argument fecha_retiro  dmyfecha_retiro.Caused by warning  8 failed to parse.ℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument hora_retiro  hmshora_retiro.Caused by warning in .parse_hms Some strings failed to parseℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument hora_retiro  hmshora_retiro.Caused by warning in .parse_hms Some strings failed to parseℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 2 warnings in mutate.The first warning wasℹ In argument hora_retiro  hmshora_retiro.Caused by warning in .parse_hms Some strings failed to parseℹ Run dplyrlast_dplyr_warnings to see the 1 remaining warning.. There were 3 warnings in mutate.The first warning wasℹ In argument fecha_retiro  dmyfecha_retiro.Caused by warning  1 failed to parse.ℹ Run dplyrlast_dplyr_warnings to see the 2 remaining warnings.. There were 2 warnings in mutate.The first warning wasℹ In argument hora_retiro  hmshora_retiro.Caused by warning in .parse_hms|
 ecobici_data_check|stem|1f8984f558b69da3|abc17b900cd2e649|49eeaa8885eb9027|-140485733||t20160.254066499s|s732b|732|rds|local|vector|||1.17||
-validate_complete_years|function|1f5e717a9d78ee34|||||||||||||||
-parse_spanish_month_name|function|d4b28db217c2dfc2|||||||||||||||
-extract_year_month|function|02fdbcd00148f777|||||||||||||||
-get_latest_station_information|function|cda7860b5c9a3ddd|||||||||||||||
-.Random.seed|object|38c95187301bbc6b|||||||||||||||
-read_from_downloading_n_preprocess|function|fc7b57a8c5088a7f|||||||||||||||
-read_from_url_n_preprocess|function|d15996b9369931d7|||||||||||||||
-check_ecobici_data_completeness|function|43233e8679ae8940|||||||||||||||
-ingest_parquet_files|function|a073cc85bb3faa16|||||||||||||||
-fetch_ecobici_cdmx_historical_monthly_csv_urls|function|ffedc3b0165dca57|||||||||||||||
-process_ecobici_online_month_data|function|5085ad5646b11a5b|||||||||||||||
-process_all_rows_safely|function|4f13240ec623247c|||||||||||||||
-sequential_process_of_urls|function|08429af50ca927a9|||||||||||||||
+ingest_parquet_filesv2|function|b8a5444ca56835ee|||||||||||||||
+quacky_db2|stem|f0cdc44fecb4817f|f16ebb9de681151b|2c530c1562a7fbd1|-1490756313||t20168.2466848312s||44|rds|local|vector|||0.867||could not find function ingest_parquet_filesv2
 validate_complete_years|function|1f5e717a9d78ee34
 parse_spanish_month_name|function|d4b28db217c2dfc2
 extract_year_month|function|02fdbcd00148f777
 get_latest_station_information|function|cda7860b5c9a3ddd
-.Random.seed|object|7dd5c421b76d562d
+.Random.seed|object|636ce118c9235e87
 read_from_downloading_n_preprocess|function|fc7b57a8c5088a7f
 read_from_url_n_preprocess|function|d15996b9369931d7
 check_ecobici_data_completeness|function|43233e8679ae8940
-ingest_parquet_files|function|a073cc85bb3faa16
+ingest_parquet_files|function|5200a66cd97a8f72
 fetch_ecobici_cdmx_historical_monthly_csv_urls|function|ffedc3b0165dca57
 process_ecobici_online_month_data|function|5085ad5646b11a5b
 process_all_rows_safely|function|4f13240ec623247c
 sequential_process_of_urls|function|08429af50ca927a9
+quacky_db|stem|f0cdc44fecb4817f|1c92dbf87dbc74d5|eed0f4b387ed5059|1535269731||t20168.2575991003s|s44b|44|rds|local|vector|||70.196||
